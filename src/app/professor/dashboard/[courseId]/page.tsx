@@ -175,7 +175,10 @@ export default function CourseDashboard() {
               <div className="font-semibold text-amber-900">Grade Submissions</div>
               <div className="text-sm text-amber-700 mt-1">Review student work</div>
             </button>
-            <button className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-all text-left">
+            <button
+              onClick={() => router.push(`/professor/dashboard/${courseId}/course-settings`)}
+              className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-all text-left"
+            >
               <div className="font-semibold text-purple-900">Course Settings</div>
               <div className="text-sm text-purple-700 mt-1">Edit course details</div>
             </button>
