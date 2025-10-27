@@ -1,6 +1,57 @@
 'use client';
 
 import { useRouter, useParams } from 'next/navigation';
+import type { Assignment } from '@/components/types';
+
+// TODO: Replace with actual data from backend
+const mockAssignments: Assignment[] = [
+  {
+    id: 1,
+    courseId: 1,
+    title: 'Persuasive Essay on Climate Change',
+    prompt: 'Write a persuasive essay...',
+    dueDate: '2025-02-15',
+    dueTime: '23:59',
+    allowLateSubmissions: true,
+    latePenalty: 10,
+    enableAI: true,
+    publishImmediately: true,
+  },
+  {
+    id: 2,
+    courseId: 1,
+    title: 'Argumentative Essay on Social Media',
+    prompt: 'Write an argumentative essay...',
+    dueDate: '2025-03-01',
+    dueTime: '23:59',
+    allowLateSubmissions: true,
+    latePenalty: 10,
+    enableAI: true,
+    publishImmediately: true,
+  },
+  {
+    id: 3,
+    courseId: 1,
+    title: 'Narrative Essay on Personal Experience',
+    prompt: 'Write a narrative essay...',
+    dueDate: '2025-03-15',
+    dueTime: '23:59',
+    allowLateSubmissions: false,
+    enableAI: true,
+    publishImmediately: true,
+  },
+  {
+    id: 4,
+    courseId: 1,
+    title: 'Comparative Analysis Essay',
+    prompt: 'Compare and analyze...',
+    dueDate: '2025-04-15',
+    dueTime: '23:59',
+    allowLateSubmissions: false,
+    enableAI: true,
+    publishImmediately: false,
+  },
+];
 
 export default function CourseDashboard() {
   const router = useRouter();
@@ -13,7 +64,7 @@ export default function CourseDashboard() {
     code: 'CS-101',
     name: 'Introduction to Computer Science',
     students: 32,
-    assignments: 5
+    assignments: mockAssignments.length
   };
 
   const handleLogout = () => {
@@ -117,7 +168,10 @@ export default function CourseDashboard() {
               <div className="font-semibold text-green-900">View Students</div>
               <div className="text-sm text-green-700 mt-1">Manage enrolled students</div>
             </button>
-            <button className="p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition-all text-left">
+            <button
+              onClick={() => router.push(`/professor/dashboard/${courseId}/grade-submissions`)}
+              className="p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition-all text-left"
+            >
               <div className="font-semibold text-amber-900">Grade Submissions</div>
               <div className="text-sm text-amber-700 mt-1">Review student work</div>
             </button>
@@ -130,14 +184,63 @@ export default function CourseDashboard() {
 
         {/* Assignments List */}
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Assignments</h2>
-          <div className="text-center py-12 text-gray-500">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-lg font-medium">No assignments yet</p>
-            <p className="text-sm mt-1">Create your first assignment to get started</p>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Assignments</h2>
+            <button
+              onClick={() => router.push(`/professor/dashboard/${courseId}/add-assignment`)}
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+            >
+              + Add Assignment
+            </button>
           </div>
+
+          {mockAssignments.length > 0 ? (
+            <div className="space-y-3">
+              {mockAssignments.map((assignment) => (
+                <button
+                  key={assignment.id}
+                  onClick={() => router.push(`/professor/dashboard/${courseId}/grade-submissions`)}
+                  className="w-full p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl border border-gray-200 hover:border-indigo-300 transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                        {assignment.title}
+                      </h3>
+                      <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                        <div className="flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
+                        </div>
+                        {assignment.publishImmediately ? (
+                          <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">
+                            Published
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs font-medium rounded">
+                            Draft
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="text-lg font-medium">No assignments yet</p>
+              <p className="text-sm mt-1">Create your first assignment to get started</p>
+            </div>
+          )}
         </div>
 
         {/* Recent Activity */}

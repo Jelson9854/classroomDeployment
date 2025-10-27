@@ -2,26 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import type { Student, StudentRole } from '@/components/types';
 
 // TODO: This will be replaced with actual data from the backend
-const mockStudents = [
+const mockStudents: Student[] = [
   { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@university.edu', role: 'student', submissions: 3 },
   { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@university.edu', role: 'student', submissions: 5 },
   { id: 3, firstName: 'Michael', lastName: 'Johnson', email: 'michael.j@university.edu', role: 'teaching_assistant', submissions: 4 },
   { id: 4, firstName: 'Emily', lastName: 'Brown', email: 'emily.brown@university.edu', role: 'student', submissions: 2 },
   { id: 5, firstName: 'David', lastName: 'Wilson', email: 'david.wilson@university.edu', role: 'student', submissions: 5 },
 ];
-
-type StudentRole = 'student' | 'teaching_assistant';
-
-interface Student {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: StudentRole;
-  submissions: number;
-}
 
 export default function ViewStudents() {
   const router = useRouter();
@@ -47,9 +37,7 @@ export default function ViewStudents() {
   };
 
   const handleStudentClick = (studentId: number) => {
-    // TODO: Navigate to student detail page
-    console.log(`Clicked student ${studentId}`);
-    // router.push(`/professor/dashboard/${courseId}/students/${studentId}`);
+    router.push(`/professor/dashboard/${courseId}/students/${studentId}`);
   };
 
   return (
