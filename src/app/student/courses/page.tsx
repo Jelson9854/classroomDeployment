@@ -1,14 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Course } from '@/components/types';
 
 // TODO: This will be replaced with actual data from the backend
-const mockCourses = [
-  { id: 1, code: 'CS-101', name: 'Introduction to Computer Science', students: 0, assignments: 0 },
+const mockCourses: Course[] = [
+  {
+    id: 1,
+    code: 'CS-101',
+    name: 'Introduction to Computer Science',
+    students: 32,
+    assignments: 5
+  },
 ];
 
 export default function CoursesSelection() {
   const router = useRouter();
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [enrollmentCode, setEnrollmentCode] = useState('');
+  const [isJoining, setIsJoining] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogout = () => {
     // TODO: Add actual logout logic (clear session, tokens, etc.)
@@ -17,7 +29,31 @@ export default function CoursesSelection() {
 
   const handleCourseClick = (courseId: number) => {
     // Navigate to course-specific dashboard
-    router.push(`/professor/dashboard/${courseId}`);
+    router.push(`/student/dashboard/${courseId}`);
+  };
+
+  const handleJoinCourse = async () => {
+    setError('');
+
+    if (!enrollmentCode.trim()) {
+      setError('Please enter a course enrollment code');
+      return;
+    }
+
+    setIsJoining(true);
+
+    // TODO: Replace with actual API call to validate and join course
+    console.log('Joining course with code:', enrollmentCode);
+
+    // Simulate API call
+    setTimeout(() => {
+      // For now, always succeed
+      alert(`Successfully joined course with code: ${enrollmentCode}`);
+      setShowJoinModal(false);
+      setEnrollmentCode('');
+      setIsJoining(false);
+      // In real implementation, refresh courses list here
+    }, 500);
   };
 
   return (
@@ -40,16 +76,16 @@ export default function CoursesSelection() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Add Course Button */}
+        {/* Join Course Button */}
         <div className="mb-8">
           <button
-            onClick={() => router.push('/professor/add-course')}
+            onClick={() => setShowJoinModal(true)}
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add New Course
+            Join a Course
           </button>
         </div>
 
@@ -105,11 +141,70 @@ export default function CoursesSelection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
               <p className="text-lg font-medium">No courses yet</p>
-              <p className="text-sm mt-1">Click &quot;Add New Course&quot; to get started</p>
+              <p className="text-sm mt-1">Click &quot;Join a Course&quot; to get started</p>
             </div>
           )}
         </div>
       </main>
+
+      {/* Join Course Modal */}
+      {showJoinModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Join a Course</h3>
+            <p className="text-gray-600 mb-6">
+              Enter the enrollment code provided by your professor to join a course.
+            </p>
+
+            <div className="mb-4">
+              <label htmlFor="enrollmentCode" className="block text-sm font-medium text-gray-700 mb-2">
+                Enrollment Code
+              </label>
+              <input
+                id="enrollmentCode"
+                type="text"
+                value={enrollmentCode}
+                onChange={(e) => setEnrollmentCode(e.target.value.toUpperCase())}
+                placeholder="e.g., CS101-FALL25-ABC123"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-gray-900 placeholder-gray-400 font-mono"
+                autoFocus
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleJoinCourse();
+                  }
+                }}
+              />
+            </div>
+
+            {error && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowJoinModal(false);
+                  setEnrollmentCode('');
+                  setError('');
+                }}
+                disabled={isJoining}
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-900 font-medium rounded-lg transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleJoinCourse}
+                disabled={isJoining}
+                className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium rounded-lg transition-all"
+              >
+                {isJoining ? 'Joining...' : 'Join Course'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
